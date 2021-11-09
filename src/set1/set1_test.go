@@ -48,8 +48,7 @@ func TestChallenge4(t *testing.T) {
 	res, minScore := "", 1e9
 	for scanner.Scan() {
 		if str, score := SingleByteXorCipher(scanner.Text()); score < minScore {
-			res = str
-			minScore = score
+			res, minScore = str, score
 		}
 	}
 

@@ -56,31 +56,32 @@ func scoreString(s string) float64 {
 	return score
 }
 
-func SingleByteXorCipher(s string) (string, float64) {
+func SingleByteXorCipher(s string) (string, float64, byte) {
 	// convert to raw bytes
 	raw, err := hex.DecodeString(s)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	minScore, bestString := 1e9, ""
+	minScore, bestString, bestKey := 1e9, "", 0
 
 	// try each xor
-	for i := 0; i < 256; i++ {
+	for k := 0; k <= 255; k++ {
 		// copy raw bytes (so we don't affect the original)
 		tmp := make([]byte, len(raw))
 		copy(tmp, raw)
 
 		for j := range raw {
-			tmp[j] ^= byte(i)
+			tmp[j] ^= byte(k)
 		}
 
 		// perform matched-filter score
 		if score := scoreString(string(tmp)); score < minScore {
 			minScore = score
 			bestString = string(tmp)
+			bestKey = k
 		}
 	}
 
-	return bestString, minScore
+	return bestString, minScore, byte(bestKey)
 }

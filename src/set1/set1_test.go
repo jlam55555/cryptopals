@@ -3,6 +3,7 @@ package set1
 import (
 	"bufio"
 	"encoding/base64"
+	"encoding/hex"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,7 +34,7 @@ func TestChallenge3(t *testing.T) {
 	s := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
 	out := "Cooking MC's like a pound of bacon"
 
-	if res, _ := SingleByteXorCipher(s); res != out {
+	if res, _, _ := SingleByteXorCipher(s); res != out {
 		t.Errorf("test case failed: got %v, expected %v", res, out)
 	}
 }
@@ -50,7 +51,7 @@ func TestChallenge4(t *testing.T) {
 	scanner := bufio.NewScanner(file)
 	res, minScore := "", 1e9
 	for scanner.Scan() {
-		if str, score := SingleByteXorCipher(scanner.Text()); score < minScore {
+		if str, score, _ := SingleByteXorCipher(scanner.Text()); score < minScore {
 			res, minScore = str, score
 		}
 	}
@@ -62,13 +63,63 @@ func TestChallenge4(t *testing.T) {
 }
 
 func TestChallenge5(t *testing.T) {
-	s := "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
-	cipher := "ICE"
+	s := []byte("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal")
+	cipher := []byte("ICE")
 	out := "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
 
-	if res := RepeatingKeyXor(s, cipher); res != out {
+	if res := hex.EncodeToString(RepeatingKeyXor(s, cipher)); res != out {
 		t.Errorf("test case failed: got %v, expected %v", res, out)
 	}
+}
+
+func TestHamming(t *testing.T) {
+	s1, s2 := []byte("this is a test"), []byte("wokka wokka!!!")
+	out := 37
+
+	if res := hamming(s1, s2); res != out {
+		t.Errorf("test case failed: got %v, expected %v", res, out)
+	}
+}
+
+func TestChallenge6(t *testing.T) {
+	// read input
+	inPath := "../../res/6.txt"
+	file, err := os.Open(inPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	s := ""
+	for scanner.Scan() {
+		s += scanner.Text()
+	}
+
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// read expected output (including newlines)
+	outPath := "../../res/6_out.txt"
+	outb, err := ioutil.ReadFile(outPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	res, key := BreakRepeatingKeyXor(b)
+	out := string(outb)
+
+	key_out := "Terminator X: Bring the noise"
+	if key != key_out {
+		t.Errorf("test case failed: got %v, expected %v", key, key_out)
+	}
+	if res != out {
+		t.Errorf("test case failed: got %v, expected %v", res, out)
+	}
+
 }
 
 func TestChallenge7(t *testing.T) {

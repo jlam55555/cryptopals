@@ -1,5 +1,5 @@
 # cryptopals
-Solutions to Cryptopals challenge
+My solutions to the Cryptopals Crypto Challenge
 
 ---
 
@@ -12,6 +12,7 @@ Because I know it has encoding libraries in its stdlib that should make this rel
 ---
 
 ### Running tests
+This checks the solutions against the test cases provided. (Note that there is no `main` function anywhere -- the tests are the driver code.)
 
 ```bash
 $ go test ./src/set1  # or,

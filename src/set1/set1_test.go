@@ -2,8 +2,11 @@ package set1
 
 import (
 	"bufio"
+	"encoding/base64"
+	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -64,6 +67,43 @@ func TestChallenge5(t *testing.T) {
 	out := "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f"
 
 	if res := RepeatingKeyXor(s, cipher); res != out {
+		t.Errorf("test case failed: got %v, expected %v", res, out)
+	}
+}
+
+func TestChallenge7(t *testing.T) {
+	// read input
+	inPath := "../../res/7.txt"
+	file, err := os.Open(inPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	s := ""
+	for scanner.Scan() {
+		s += scanner.Text()
+	}
+
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// read expected output (including newlines)
+	outPath := "../../res/7_out.txt"
+	outb, err := ioutil.ReadFile(outPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	key := []byte("YELLOW SUBMARINE")
+	out := string(outb)
+
+	// use HasPrefix to ignore padding at end
+	if res := AesDecode(b, key); strings.HasPrefix(res, out) {
 		t.Errorf("test case failed: got %v, expected %v", res, out)
 	}
 }

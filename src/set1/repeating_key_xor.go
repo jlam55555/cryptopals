@@ -4,10 +4,10 @@ import (
 	"encoding/hex"
 )
 
-func RepeatingKeyXor(s, cipher string) string {
+func RepeatingKeyXor(s, key string) string {
 	raw := []byte(s)
 	for i := range raw {
-		raw[i] ^= cipher[i%len(cipher)]
+		raw[i] ^= key[i%len(key)]
 	}
 	return hex.EncodeToString(raw)
 }
